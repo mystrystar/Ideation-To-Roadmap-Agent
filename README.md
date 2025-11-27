@@ -12,3 +12,7 @@ Prioritisation Agent: This is the strategic gatekeeper. It applies a scoring fra
 Roadmap Agent: Focused on agile execution, this agent breaks the prioritized feature set into three distinct phases: MVP (core features for immediate validation), Phase 2 (features for growth and scaling), and Phase 3 (advanced features for market leadership). It assigns realistic timelines, defines success metrics for each phase, and maps out technical dependencies.
 
 Output Formatting Agent: This final agent synthesizes all the complex data from the previous four steps into an Executive Summary for stakeholders. It provides key insights, a clear Go/No-Go recommendation, a condensed business case (including expected ROI and competitive advantage), a specific plan of immediate next steps, and a defined risk mitigation strategy.
+
+<img width="1700" height="312" alt="N8n Muti agent" src="https://github.com/user-attachments/assets/2fa1beb1-be26-43ec-991b-d1b18b6b5d87" />
+
+
