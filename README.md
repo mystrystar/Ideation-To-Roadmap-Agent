@@ -13,6 +13,6 @@ Roadmap Agent: Focused on agile execution, this agent breaks the prioritized fea
 
 Output Formatting Agent: This final agent synthesizes all the complex data from the previous four steps into an Executive Summary for stakeholders. It provides key insights, a clear Go/No-Go recommendation, a condensed business case (including expected ROI and competitive advantage), a specific plan of immediate next steps, and a defined risk mitigation strategy.
 
-<img width="1700" height="312" alt="N8n Muti agent" src="https://github.com/user-attachments/assets/2fa1beb1-be26-43ec-991b-d1b18b6b5d87" />
+<img width="1656" height="267" alt="n8n" src="https://github.com/user-attachments/assets/cf9db04c-383b-4731-9f36-9518873a2c24" />
 
 
