@@ -1,0 +1,660 @@
+{
+  "name": "IdeathonetoroadmapMutiAgent",
+  "nodes": [
+    {
+      "parameters": {
+        "pollTimes": {
+          "item": [
+            {
+              "mode": "everyMinute"
+            }
+          ]
+        },
+        "documentId": {
+          "__rl": true,
+          "value": "1m04mkVt9B8V0hJ4yBlY31gHDxtKbEmVTjVSxYBuVXxQ",
+          "mode": "list",
+          "cachedResultName": "AI Agent Input - Ideation and Product Priority",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1m04mkVt9B8V0hJ4yBlY31gHDxtKbEmVTjVSxYBuVXxQ/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Input Sheet",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1m04mkVt9B8V0hJ4yBlY31gHDxtKbEmVTjVSxYBuVXxQ/edit#gid=0"
+        },
+        "event": "rowAdded",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheetsTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "0af2a92c-baf0-48b2-9089-8fb43314433d",
+      "name": "Google Sheets Trigger",
+      "credentials": {
+        "googleSheetsTriggerOAuth2Api": {
+          "id": "pIYnvPJjXra0GOmb",
+          "name": "Google Sheets Trigger account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=You are a Product Ideation Agent specializing in refining and expanding product concepts for successful market entry.\n\nCONTEXT:\n- Original Idea: {{$json.ideaDescription}}\n- Business Context: {{$json.businessContext}}\n- Target Audience: {{ $json.targetAudience }}\n- Constraints: {{$json.constraints}}\n- Timeline: {{$json.timelinePreference}}\n\nYOUR EXPERTISE:\nYou excel at transforming rough ideas into clear, actionable product concepts. You understand market dynamics, user psychology, and product-market fit principles.\n\nTASKS:\n1. REFINE the original idea for maximum clarity, feasibility, and market appeal\n2. GENERATE 2-3 strategic alternative variations that address the same core need\n3. IDENTIFY the fundamental user problems and pain points being solved\n4. SUGGEST 4-6 key features that deliver core value (prioritize MVP essentials)\n5. ARTICULATE the unique value proposition that differentiates from competitors\n6. ASSESS the idea's innovation potential and market disruption opportunity\n\nOUTPUT FORMAT (must be valid JSON):\n{\n    \"refined_idea\": \"A clear, compelling product description in 2-3 sentences\",\n    \"alternatives\": [\"Alternative approach 1\", \"Alternative approach 2\", \"Alternative approach 3\"],\n    \"core_problems\": [\"Primary user pain point\", \"Secondary user pain point\", \"Business problem solved\"],\n    \"key_features\": [\"Essential feature 1\", \"Essential feature 2\", \"Essential feature 3\", \"Key differentiator feature\"],\n    \"value_proposition\": \"Single sentence explaining why users will choose this over alternatives\",\n    \"innovation_score\": 8,\n    \"feasibility_assessment\": \"Brief assessment of technical and business feasibility\"\n}\n\nIMPORTANT: Respond ONLY with the JSON object. No additional text or explanations outside the JSON structure.",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3,
+      "position": [
+        448,
+        0
+      ],
+      "id": "af970e47-69a5-4d94-a07f-00bf8537c60c",
+      "name": "Ideation"
+    },
+    {
+      "parameters": {
+        "modelName": "models/gemini-2.0-flash-lite",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        528,
+        224
+      ],
+      "id": "c60080f8-8418-44e4-94c8-77106332426e",
+      "name": "Google Gemini Chat Model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "UK5GM7gkGcFlM8mH",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=You are a Senior Market Research Agent with expertise in competitive analysis, market sizing, and trend identification across various industries.\n\nCONTEXT:\n- Product Idea:{{ $('Input').item.json.ideaDescription }}\n- Target Audience: {{ $('Input').item.json.targetAudience }}\n- Key Features: {{$json.ideationResult.key_features}}\n- Value Proposition: {{$json.ideationResult.value_proposition}}\n- Business Context:{{ $('Input').item.json.businessContext }}\nYOUR EXPERTISE:\nYou have deep knowledge of market dynamics, competitive landscapes, consumer behavior, and emerging trends. You provide data-driven insights that inform strategic decisions.\n\nANALYSIS FRAMEWORK:\n1. MARKET SIZE: Estimate the Total Addressable Market (TAM) and Serviceable Available Market (SAM)\n2. COMPETITIVE LANDSCAPE: Identify direct and indirect competitors with their strengths/weaknesses\n3. TREND ANALYSIS: Highlight relevant market trends, technological shifts, and consumer behavior changes\n4. OPPORTUNITY ASSESSMENT: Evaluate market gaps and white space opportunities\n5. RISK EVALUATION: Identify potential market, competitive, and regulatory risks\n6. MARKET TIMING: Assess whether market conditions are favorable for entry\n\nOUTPUT FORMAT (must be valid JSON):\n{\n    \"market_size\": \"Detailed market size estimation with TAM/SAM breakdown\",\n    \"market_growth_rate\": \"Expected annual growth rate with rationale\",\n    \"competitors\": [\n        {\n            \"name\": \"Competitor 1\",\n            \"strength\": \"Key competitive advantage\",\n            \"weakness\": \"Main vulnerability\",\n            \"market_share\": \"Estimated market position\"\n        },\n        {\n            \"name\": \"Competitor 2\",\n            \"strength\": \"Key competitive advantage\",\n            \"weakness\": \"Main vulnerability\",\n            \"market_share\": \"Estimated market position\"\n        }\n    ],\n    \"market_trends\": [\"Trend 1 with impact assessment\", \"Trend 2 with impact assessment\", \"Trend 3 with impact assessment\"],\n    \"opportunities\": [\"Market gap 1\", \"Market gap 2\", \"Emerging opportunity\"],\n    \"risks\": [\"Risk 1 with likelihood\", \"Risk 2 with likelihood\"],\n    \"attractiveness_score\": 8,\n    \"market_timing\": \"Assessment of entry timing (Excellent/Good/Fair/Poor)\",\n    \"market_summary\": \"Comprehensive 2-3 sentence market analysis summary\",\n    \"strategic_recommendations\": [\"Market entry strategy 1\", \"Market entry strategy 2\"]\n}\n\nIMPORTANT: Provide realistic, research-backed assessments. Use a 1-10 scale for attractiveness_score where 10 is extremely attractive. Respond ONLY with the JSON object.",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3,
+      "position": [
+        1024,
+        0
+      ],
+      "id": "bd55fbdb-4208-4b2f-ad60-e07e61838442",
+      "name": "Market Research"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Validate required fields\nconst requiredFields = ['idea_description', 'business_context'];\nconst inputData = items[0].json;\n\nfor (const field of requiredFields) {\n    if (!inputData[field] || inputData[field].trim() === '') {\n        throw new Error(`Missing required field: ${field}`);\n    }\n}\n\n// Clean and structure data\nconst processedInput = {\n    ideaDescription: inputData.idea_description.trim(),\n    businessContext: inputData.business_context.trim(),\n    targetAudience: inputData.target_audience || 'General users',\n    constraints: inputData.constraints || 'No specific constraints',\n    timelinePreference: inputData.timeline_preference || '3-6 months'\n};\n\nreturn [{ json: processedInput }];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        224,
+        0
+      ],
+      "id": "4c0724e5-1ac6-4578-a5e0-f9830f0cdeb7",
+      "name": "Input"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Get the AI response\nconst aiResponse = items[0].json.output || items[0].json.text || items[0].json.response;\n\ntry {\n    // Try to parse as JSON directly\n    let ideationResult;\n    if (typeof aiResponse === 'string') {\n        // Clean the response - remove markdown formatting if present\n        const cleanResponse = aiResponse.replace(/```json\\n?|\\n?```/g, '').trim();\n        ideationResult = JSON.parse(cleanResponse);\n    } else {\n        ideationResult = aiResponse;\n    }\n\n    // Validate required fields\n    const requiredFields = ['refined_idea', 'alternatives', 'core_problems', 'key_features', 'value_proposition'];\n    for (const field of requiredFields) {\n        if (!ideationResult[field]) {\n            throw new Error(`Missing required field: ${field}`);\n        }\n    }\n\n    // Ensure arrays are properly formatted\n    if (!Array.isArray(ideationResult.alternatives)) ideationResult.alternatives = [];\n    if (!Array.isArray(ideationResult.core_problems)) ideationResult.core_problems = [];\n    if (!Array.isArray(ideationResult.key_features)) ideationResult.key_features = [];\n\n    return [{\n        json: {\n            ...items[0].json,\n            ideationResult: ideationResult\n        }\n    }];\n} catch (error) {\n    console.error('Error parsing ideation response:', error);\n    throw new Error(`Failed to parse ideation agent response: ${error.message}`);\n}"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        800,
+        0
+      ],
+      "id": "67212711-8873-4238-9bbd-b7939e718f3f",
+      "name": "Output"
+    },
+    {
+      "parameters": {
+        "modelName": "models/gemini-2.0-flash-lite",
+        "options": {
+          "maxOutputTokens": 1000,
+          "temperature": 0.3
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        1104,
+        224
+      ],
+      "id": "1801a520-d2d5-465e-adc9-a2cccae363f2",
+      "name": "Google Gemini Chat Model1",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "UK5GM7gkGcFlM8mH",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "modelName": "models/gemini-2.0-flash-lite",
+        "options": {
+          "maxOutputTokens": 800,
+          "temperature": 0.2
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        1456,
+        240
+      ],
+      "id": "22b49f67-2a5e-4167-a062-aed29d5bd2b5",
+      "name": "Google Gemini Chat Model2",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "UK5GM7gkGcFlM8mH",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=You are a Strategic Prioritization Agent specializing in product portfolio management and ROI optimization using industry-standard frameworks.\n\nCONTEXT:\n- Product Idea:{{ $('Input').item.json.ideaDescription }}\n- Key Features: {{ $('Output').item.json.ideationResult.key_features }}\n- Market Analysis: {{$json.marketResult.market_summary}}\n- Market Attractiveness: {{$json.marketResult.attractiveness_score}}/10\n- Business Context: {{ $('Input').item.json.businessContext }}\n- Constraints: {{ $('Input').item.json.constraints }}\n- Timeline Preference: {{ $('Input').item.json.timelinePreference }}\n- Competitive Risks: {{$json.marketResult.risks}}\n\nYOUR EXPERTISE:\nYou apply proven prioritization frameworks (RICE, ICE, Value vs Effort, MoSCoW) to evaluate product opportunities. You balance quantitative metrics with strategic considerations.\n\nSCORING CRITERIA (Rate each 1-10 where 10 is best):\n1. BUSINESS VALUE: Revenue potential, strategic alignment, market size impact\n2. USER IMPACT: User satisfaction gain, problem significance, user base size affected\n3. EFFORT REQUIRED: Development complexity, resource requirements, time investment (10 = low effort, 1 = high effort)\n4. RISK LEVEL: Technical feasibility, market acceptance, execution risks (10 = low risk, 1 = high risk)\n5. MARKET TIMING: Market readiness, competitive window, trend alignment\n6. STRATEGIC FIT: Alignment with business goals, platform synergies, brand consistency\n\nCALCULATION: Priority Score = (Business Value + User Impact + Market Timing + Strategic Fit) - (Effort Required + Risk Level)\n\nOUTPUT FORMAT (must be valid JSON):\n{\n    \"business_value\": 8,\n    \"user_impact\": 7,\n    \"effort_required\": 6,\n    \"risk_level\": 4,\n    \"market_timing\": 8,\n    \"strategic_fit\": 7,\n    \"calculated_score\": 20,\n    \"priority_tier\": \"High\",\n    \"confidence_level\": \"Medium\",\n    \"ice_score\": {\n        \"impact\": 8,\n        \"confidence\": 7,\n        \"ease\": 6\n    },\n    \"recommendation\": \"Proceed/Hold/Reject\",\n    \"justification\": \"2-3 sentence explanation of the scoring rationale and key factors\",\n    \"success_probability\": 75,\n    \"roi_estimate\": \"Expected return on investment assessment\",\n    \"critical_success_factors\": [\"Factor 1\", \"Factor 2\", \"Factor 3\"]\n}\n\nPRIORITY TIERS:\n- High (Score 15+): Immediate execution recommended\n- Medium (Score 8-14): Consider for next planning cycle\n- Low (Score <8): Revisit when constraints change\n\nIMPORTANT: Be objective and realistic. Consider the stated constraints heavily in your scoring. Respond ONLY with the JSON object.",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3,
+      "position": [
+        1584,
+        32
+      ],
+      "id": "4dc4ade8-eb44-4131-bd77-cc81b5c864f5",
+      "name": "Proritization Agent"
+    },
+    {
+      "parameters": {
+        "modelName": "models/gemini-2.0-flash-lite",
+        "options": {
+          "maxOutputTokens": 800,
+          "temperature": 0.3
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        2016,
+        256
+      ],
+      "id": "2e42bd68-93ad-478b-8447-ca531946d3f6",
+      "name": "Google Gemini Chat Model3",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "UK5GM7gkGcFlM8mH",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=You are a Senior Product Roadmap Agent specializing in agile product development, feature prioritization, and strategic execution planning.\n\nCONTEXT:\n- Product Idea:{{ $('Input').item.json.ideaDescription }}\n- Key Features: {{ $('Output').item.json.ideationResult.key_features }}\n- Priority Score: {{$json.priorityResult.calculated_score}} ({{$json.priorityResult.priority_tier}} Priority)\n- Effort Assessment: {{$json.priorityResult.effort_required}}/10\n- Risk Level: {{$json.priorityResult.risk_level}}/10\n- Timeline Preference: {{ $('Input').item.json.timelinePreference }}\n- Business Constraints: {{ $('Input').item.json.constraints }}\n- Market Timing: {{$json.priorityResult.market_timing}}/10\n- Success Factors: {{$json.priorityResult.critical_success_factors}}\n\nYOUR EXPERTISE:\nYou excel at breaking down complex products into executable phases, identifying dependencies, and creating realistic timelines. You apply lean startup principles and agile methodologies.\n\nROADMAP FRAMEWORK:\n1. MVP (Minimum Viable Product): Core features that validate the concept and deliver immediate value\n2. Phase 2 (Growth): Features that scale usage and improve user experience\n3. Phase 3 (Scale): Advanced features for market leadership and expansion\n4. Consider technical debt, user feedback cycles, and market response\n\nTIMELINE CONSIDERATIONS:\n- Account for development complexity, team capacity, and market windows\n- Include buffer time for testing, iterations, and unforeseen challenges\n- Balance speed-to-market with quality and user experience\n\nOUTPUT FORMAT (must be valid JSON):\n{\n    \"mvp_features\": [\"Core feature 1\", \"Core feature 2\", \"Essential feature 3\"],\n    \"mvp_timeline\": \"2-3 months\",\n    \"mvp_success_metrics\": [\"Metric 1 with target\", \"Metric 2 with target\"],\n    \"phase2_features\": [\"Growth feature 1\", \"Enhancement 2\", \"Integration 3\"],\n    \"phase2_timeline\": \"4-6 months from start\",\n    \"phase2_success_metrics\": [\"Scale metric 1\", \"Engagement metric 2\"],\n    \"phase3_features\": [\"Advanced feature 1\", \"Platform expansion 2\"],\n    \"phase3_timeline\": \"8-12 months from start\",\n    \"phase3_success_metrics\": [\"Market metric 1\", \"Revenue metric 2\"],\n    \"dependencies\": [\n        {\n            \"prerequisite\": \"Feature A\",\n            \"dependent\": \"Feature B\",\n            \"reason\": \"Technical dependency explanation\"\n        }\n    ],\n    \"critical_path\": [\"MVP Feature 1 → Phase 2 Feature 1 → Phase 3 Feature 1\"],\n    \"parallel_development\": [\"Features that can be built simultaneously\"],\n    \"team_requirements\": {\n        \"mvp_phase\": [\"Role 1\", \"Role 2\", \"Skill requirement\"],\n        \"scaling_phase\": [\"Additional role 1\", \"Specialized skill 2\"]\n    },\n    \"risk_mitigation_plan\": [\n        {\n            \"risk\": \"Technical risk description\",\n            \"mitigation\": \"Specific action to reduce risk\",\n            \"timeline_impact\": \"Potential delay assessment\"\n        }\n    ],\n    \"resource_allocation\": {\n        \"development_effort\": \"% breakdown by phase\",\n        \"design_effort\": \"% breakdown by phase\",\n        \"testing_effort\": \"% breakdown by phase\"\n    },\n    \"go_to_market_timeline\": [\"Pre-launch activities\", \"Launch activities\", \"Post-launch activities\"],\n    \"iteration_plan\": \"Strategy for incorporating user feedback and market learnings\"\n}\n\nIMPORTANT: Be realistic about timelines and account for the stated constraints. Ensure MVP is truly minimal but viable. Respond ONLY with the JSON object.",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3,
+      "position": [
+        2144,
+        48
+      ],
+      "id": "389f7b03-06bb-45fc-a08c-fd97089cc008",
+      "name": "Roadmap"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Get AI response\nconst aiResponse =\n    items[0].json.output ||\n    items[0].json.text ||\n    items[0].json.response;\n\nif (!aiResponse) {\n    throw new Error(\"AI response is empty\");\n}\n\n/**\n * Extract JSON-like structure robustly\n * We don't trust the AI JSON — we rebuild our own.\n */\n\nfunction extractValue(key, text) {\n    // Extract string field: \"key\": \"value...\"\n    const strRegex = new RegExp(`\"${key}\"\\\\s*:\\\\s*\"(.*?)\"`, \"s\");\n    const matchStr = text.match(strRegex);\n    if (matchStr) return matchStr[1].replace(/\\n/g, \" \");\n\n    // Extract number field\n    const numRegex = new RegExp(`\"${key}\"\\\\s*:\\\\s*(\\\\d+)`);\n    const matchNum = text.match(numRegex);\n    if (matchNum) return Number(matchNum[1]);\n\n    return null;\n}\n\nfunction extractArrayOfObjects(key, text) {\n    const regex = new RegExp(`\"${key}\"\\\\s*:\\\\s*\\\\[(.*?)\\\\]`, \"s\");\n    const match = text.match(regex);\n    if (!match) return [];\n\n    const block = match[1];\n\n    // Split into objects\n    const objects = block.split(\"},\").map(obj => obj + \"}\");\n    \n    return objects.map(objText => {\n        return {\n            name: extractValue(\"name\", objText),\n            strength: extractValue(\"strength\", objText),\n            weakness: extractValue(\"weakness\", objText),\n            market_share: extractValue(\"market_share\", objText)\n        };\n    });\n}\n\nfunction extractArray(key, text) {\n    const regex = new RegExp(`\"${key}\"\\\\s*:\\\\s*\\\\[(.*?)\\\\]`, \"s\");\n    const match = text.match(regex);\n    if (!match) return [];\n\n    return match[1]\n        .split(/\",\\s*\"/)\n        .map(s => s.replace(/(^\")|(\"$)/g, \"\").trim());\n}\n\n// ---- Rebuild clean JSON ----\n\nconst marketResult = {\n    market_size: extractValue(\"market_size\", aiResponse),\n    market_growth_rate: extractValue(\"market_growth_rate\", aiResponse),\n    competitors: extractArrayOfObjects(\"competitors\", aiResponse),\n    market_trends: extractArray(\"market_trends\", aiResponse),\n    opportunities: extractArray(\"opportunities\", aiResponse),\n    risks: extractArray(\"risks\", aiResponse),\n    attractiveness_score: extractValue(\"attractiveness_score\", aiResponse) ?? 5,\n    market_timing: extractValue(\"market_timing\", aiResponse),\n    market_summary: extractValue(\"market_summary\", aiResponse)\n};\n\n// ---- Final response ----\nreturn [\n    {\n        json: {\n            ...items[0].json,\n            marketResult\n        }\n    }\n];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1376,
+        32
+      ],
+      "id": "05087576-2e75-4ba2-914e-7903937b354f",
+      "name": "MarketResearch Output"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Get the AI response\nconst aiResponse = items[0].json.output || items[0].json.text || items[0].json.response;\n\ntry {\n    // Parse the JSON response\n    let priorityResult;\n    if (typeof aiResponse === 'string') {\n        const cleanResponse = aiResponse.replace(/```json\\n?|\\n?```/g, '').trim();\n        priorityResult = JSON.parse(cleanResponse);\n    } else {\n        priorityResult = aiResponse;\n    }\n\n    // Validate and normalize scores (must be 1-10)\n    const scoreFields = ['business_value', 'user_impact', 'effort_required', 'risk_level', 'market_timing', 'strategic_fit'];\n    for (const field of scoreFields) {\n        if (typeof priorityResult[field] !== 'number' || \n            priorityResult[field] < 1 || \n            priorityResult[field] > 10) {\n            priorityResult[field] = 5; // Default middle value\n        }\n    }\n\n    // Recalculate priority score to ensure accuracy\n    const calculatedScore = (\n        priorityResult.business_value + \n        priorityResult.user_impact + \n        priorityResult.market_timing + \n        priorityResult.strategic_fit\n    ) - (\n        (10 - priorityResult.effort_required + 1) + // Invert effort (higher effort = lower score)\n        (10 - priorityResult.risk_level + 1) // Invert risk (higher risk = lower score)\n    );\n    \n    priorityResult.calculated_score = Math.round(calculatedScore);\n\n    // Determine priority tier based on calculated score\n    if (priorityResult.calculated_score >= 15) {\n        priorityResult.priority_tier = \"High\";\n    } else if (priorityResult.calculated_score >= 8) {\n        priorityResult.priority_tier = \"Medium\";\n    } else {\n        priorityResult.priority_tier = \"Low\";\n    }\n\n    // Ensure arrays exist\n    if (!Array.isArray(priorityResult.critical_success_factors)) {\n        priorityResult.critical_success_factors = [];\n    }\n\n    // Validate ICE score object\n    if (!priorityResult.ice_score || typeof priorityResult.ice_score !== 'object') {\n        priorityResult.ice_score = {\n            impact: priorityResult.user_impact,\n            confidence: 5,\n            ease: priorityResult.effort_required\n        };\n    }\n\n    return [{\n        json: {\n            ...items[0].json,\n            priorityResult: priorityResult\n        }\n    }];\n} catch (error) {\n    console.error('Error parsing prioritization response:', error);\n    throw new Error(`Failed to parse prioritization agent response: ${error.message}`);\n}"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1936,
+        48
+      ],
+      "id": "32be7325-6e84-40b6-8b85-f88a812a6c28",
+      "name": "Prioritization Output"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Get the AI response\nconst aiResponse =\n    items[0].json.output ||\n    items[0].json.text ||\n    items[0].json.response;\n\nif (!aiResponse) {\n    throw new Error(\"AI response is empty\");\n}\n\n// ----- HELPERS -----\nfunction extractArray(key, text) {\n    const regex = new RegExp(`\"${key}\"\\\\s*:\\\\s*\\\\[(.*?)\\\\]`, \"s\");\n    const match = text.match(regex);\n    if (!match) return [];\n\n    return match[1]\n        .split(/\",\\s*\"/)\n        .map(s => s.replace(/(^\")|(\"$)/g, \"\").trim());\n}\n\nfunction extractArrayOfObjects(key, text) {\n    const regex = new RegExp(`\"${key}\"\\\\s*:\\\\s*\\\\[(.*?)\\\\]`, \"s\");\n    const match = text.match(regex);\n    if (!match) return [];\n\n    const block = match[1];\n    const objects = block.split(\"},\").map(o => o + \"}\");\n\n    return objects.map(obj => ({\n        prerequisite: (obj.match(/\"prerequisite\"\\s*:\\s*\"(.*?)\"/) || [])[1] || \"\",\n        dependent: (obj.match(/\"dependent\"\\s*:\\s*\"(.*?)\"/) || [])[1] || \"\",\n        reason: (obj.match(/\"reason\"\\s*:\\s*\"(.*?)\"/) || [])[1] || \"\"\n    }));\n}\n\nfunction extractString(key, text) {\n    const regex = new RegExp(`\"${key}\"\\\\s*:\\\\s*\"(.*?)\"`, \"s\");\n    const match = text.match(regex);\n    return match ? match[1].replace(/\\n/g, \" \") : \"\";\n}\n\n// ----- REBUILD JSON SAFELY -----\nconst roadmapResult = {\n    mvp_features: extractArray(\"mvp_features\", aiResponse),\n    mvp_timeline: extractString(\"mvp_timeline\", aiResponse) || \"3 months\",\n    mvp_success_metrics: extractArray(\"mvp_success_metrics\", aiResponse),\n\n    phase2_features: extractArray(\"phase2_features\", aiResponse),\n    phase2_timeline: extractString(\"phase2_timeline\", aiResponse) || \"6 months\",\n    phase2_success_metrics: extractArray(\"phase2_success_metrics\", aiResponse),\n\n    phase3_features: extractArray(\"phase3_features\", aiResponse),\n    phase3_timeline: extractString(\"phase3_timeline\", aiResponse) || \"12 months\",\n    phase3_success_metrics: extractArray(\"phase3_success_metrics\", aiResponse),\n\n    dependencies: extractArrayOfObjects(\"dependencies\", aiResponse),\n\n    critical_path: extractArray(\"critical_path\", aiResponse),\n    parallel_development: extractArray(\"parallel_development\", aiResponse),\n\n    team_requirements: {\n        mvp_phase: extractArray(\"mvp_phase\", aiResponse),\n        scaling_phase: extractArray(\"scaling_phase\", aiResponse)\n    },\n\n    roadmap_summary:\n        \"MVP (\" +\n        (extractString(\"mvp_timeline\", aiResponse) || \"3 months\") +\n        \"): \" +\n        extractArray(\"mvp_features\", aiResponse).length +\n        \" features\"\n};\n\n// ----- RETURN -----\nreturn [\n    {\n        json: {\n            ...items[0].json,\n            roadmapResult\n        }\n    }\n];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2496,
+        48
+      ],
+      "id": "76b524c6-5d99-49fe-9120-97bfeeced138",
+      "name": "Roadmap Refformated"
+    },
+    {
+      "parameters": {
+        "modelName": "models/gemini-2.0-flash-lite",
+        "options": {
+          "maxOutputTokens": 1000,
+          "temperature": 0.3
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        2576,
+        272
+      ],
+      "id": "0d1aa1b2-6b86-474c-8283-b921d22a7701",
+      "name": "Google Gemini Chat Model4",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "UK5GM7gkGcFlM8mH",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=You are an Executive Summary Agent specializing in synthesizing complex product analysis into actionable business recommendations for stakeholders and decision-makers.\n\nCOMPREHENSIVE ANALYSIS DATA:\n- Refined Product Idea: {{ $('Output').item.json.ideationResult.refined_idea }}\n- Value Proposition:{{ $('Output').item.json.ideationResult.value_proposition }}\n- Market Attractiveness:{{ $('MarketResearch Output').item.json.marketResult.attractiveness_score }}/10\n- Priority Score: {{ $('Prioritization Output').item.json.priorityResult.calculated_score }} ({{ $('Prioritization Output').item.json.priorityResult.priority_tier }} Priority)\n- Market Summary: {{ $('MarketResearch Output').item.json.marketResult.market_summary }}\n- MVP Timeline: {{$json.roadmapResult.mvp_timeline}}\n- Key Risks:{{ $('MarketResearch Output').item.json.marketResult.risks }}\n- Success Probability: {{ $('Prioritization Output').item.json.priorityResult.success_probability }}%\n- Recommendation: {{ $('Prioritization Output').item.json.priorityResult.recommendation }}\n- Business Context: {{ $('Input').item.json.businessContext }}\n- Resource Requirements: {{$json.roadmapResult.team_requirements}}\n\nYOUR EXPERTISE:\nYou excel at distilling complex analysis into clear, actionable insights that drive executive decision-making. You balance optimism with realism and provide concrete next steps.\n\nEXECUTIVE COMMUNICATION PRINCIPLES:\n1. Lead with the recommendation and key insights\n2. Provide clear rationale backed by data\n3. Address risks proactively with mitigation strategies\n4. Focus on business impact and ROI\n5. Include specific, measurable next steps\n\nOUTPUT FORMAT (must be valid JSON):\n{\n    \"executive_summary\": \"Compelling 2-3 sentence summary highlighting the opportunity, recommendation, and expected outcome\",\n    \"key_insights\": [\n        \"Primary insight about market opportunity\",\n        \"Critical insight about competitive advantage\",\n        \"Important insight about execution feasibility\"\n    ],\n    \"recommendation\": \"Clear Go/No-Go recommendation with confidence level\",\n    \"business_case\": {\n        \"opportunity_size\": \"Market size and revenue potential assessment\",\n        \"competitive_advantage\": \"Key differentiators and defensibility\",\n        \"resource_investment\": \"Required investment in time, people, and budget\",\n        \"expected_roi\": \"Return on investment projection and timeline\"\n    },\n    \"immediate_next_steps\": [\n        \"Specific action item 1 with owner and timeline\",\n        \"Specific action item 2 with owner and timeline\",\n        \"Specific action item 3 with owner and timeline\"\n    ],\n    \"success_metrics\": [\n        \"Primary KPI with target and measurement method\",\n        \"Secondary KPI with target and measurement method\"\n    ],\n    \"risk_mitigation_plan\": [\n        {\n            \"risk\": \"Highest priority risk\",\n            \"impact\": \"High/Medium/Low\",\n            \"mitigation\": \"Specific mitigation strategy\",\n            \"owner\": \"Recommended responsible party\"\n        },\n        {\n            \"risk\": \"Secondary risk\",\n            \"impact\": \"High/Medium/Low\",\n            \"mitigation\": \"Specific mitigation strategy\",\n            \"owner\": \"Recommended responsible party\"\n        }\n    ],\n    \"decision_timeline\": \"Recommended timeframe for go/no-go decision\",\n    \"resource_requirements_summary\": \"High-level summary of team, budget, and time requirements\",\n    \"strategic_alignment\": \"Assessment of how this aligns with broader business strategy and goals\"\n}\n\nIMPORTANT: Be decisive and actionable. Avoid hedging language. Provide specific, measurable recommendations. Respond ONLY with the JSON object.",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3,
+      "position": [
+        2704,
+        64
+      ],
+      "id": "a06ca97b-12ee-471c-a24a-fe96b0986038",
+      "name": "Output Formatting Agent"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Get the AI response\nconst aiResponse = items[0].json.output || items[0].json.text || items[0].json.response;\n\ntry {\n    // Parse the JSON response\n    let outputResult;\n    if (typeof aiResponse === 'string') {\n        const cleanResponse = aiResponse.replace(/```json\\n?|\\n?```/g, '').trim();\n        outputResult = JSON.parse(cleanResponse);\n    } else {\n        outputResult = aiResponse;\n    }\n\n    // Validate required fields with defaults\n    const requiredFields = {\n        'executive_summary': 'Analysis completed for product opportunity assessment.',\n        'recommendation': 'Further evaluation recommended.',\n        'key_insights': [],\n        'immediate_next_steps': [],\n        'success_metrics': [],\n        'decision_timeline': '2 weeks'\n    };\n\n    for (const [field, defaultValue] of Object.entries(requiredFields)) {\n        if (!outputResult[field]) {\n            outputResult[field] = defaultValue;\n        }\n    }\n\n    // Ensure nested objects exist\n    if (!outputResult.business_case || typeof outputResult.business_case !== 'object') {\n        outputResult.business_case = {\n            opportunity_size: 'Market opportunity assessment pending',\n            competitive_advantage: 'Competitive positioning to be determined',\n            resource_investment: 'Resource requirements analysis needed',\n            expected_roi: 'ROI projection to be calculated'\n        };\n    }\n\n    // Ensure arrays are properly formatted\n    const arrayFields = ['key_insights', 'immediate_next_steps', 'success_metrics', 'risk_mitigation_plan'];\n    for (const field of arrayFields) {\n        if (outputResult[field] && !Array.isArray(outputResult[field])) {\n            outputResult[field] = [];\n        }\n    }\n\n    // Validate risk mitigation plan structure\n    if (outputResult.risk_mitigation_plan && Array.isArray(outputResult.risk_mitigation_plan)) {\n        outputResult.risk_mitigation_plan = outputResult.risk_mitigation_plan.map(risk => {\n            if (typeof risk === 'string') {\n                return {\n                    risk: risk,\n                    impact: 'Medium',\n                    mitigation: 'Mitigation strategy to be defined',\n                    owner: 'Product team'\n                };\n            }\n            return risk;\n        });\n    }\n\n    return [{\n        json: {\n            ...items[0].json,\n            outputResult: outputResult\n        }\n    }];\n} catch (error) {\n    console.error('Error parsing output formatting response:', error);\n    throw new Error(`Failed to parse output formatting agent response: ${error.message}`);\n}"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        3056,
+        80
+      ],
+      "id": "61c9f04c-cdc9-45ee-9dc6-cf0128d83f82",
+      "name": "Output Reformatted"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Generate unique ID for this analysis session\nconst ideaId = `IDEA_${Date.now()}_${Math.random().toString(36).substr(2, 5)}`;\nconst analysisDate = new Date().toISOString().split('T')[0];\nconst analysisTime = new Date().toISOString().split('T')[1].split('.')[0];\n\n// Helper function to safely join arrays\nconst safeJoin = (arr, separator = '; ') => {\n  if (!arr || !Array.isArray(arr)) return '';\n  return arr.map(item =>\n    typeof item === 'object' ? JSON.stringify(item) : String(item)\n  ).join(separator);\n};\n\n// Helper function to extract nested object values\nconst extractNestedData = (obj, defaultValue = '') => {\n  if (!obj || typeof obj !== 'object') return defaultValue;\n  return Object.entries(obj)\n    .map(([key, value]) => `${key}: ${value}`)\n    .join('; ');\n};\n\n// Compile comprehensive results for Google Sheets\nconst finalOutput = {\n  // Primary Identifiers\n  idea_id: ideaId,\n  analysis_date: analysisDate,\n  analysis_time: analysisTime,\n\n  // Core Product Information\n  original_idea: $json.ideaDescription || '',\n  refined_idea: $json.ideationResult?.refined_idea || '',\n  value_proposition: $json.ideationResult?.value_proposition || '',\n  target_audience: $json.targetAudience || '',\n  business_context: $json.businessContext || '',\n\n  // Ideation Results\n  alternative_ideas: safeJoin($json.ideationResult?.alternatives),\n  core_problems: safeJoin($json.ideationResult?.core_problems),\n  key_features: safeJoin($json.ideationResult?.key_features),\n  innovation_score: $json.ideationResult?.innovation_score || 0,\n\n  // Market Analysis\n  market_summary: $json.marketResult?.market_summary || '',\n  market_size: $json.marketResult?.market_size || '',\n  market_attractiveness_score: $json.marketResult?.attractiveness_score || 0,\n  market_growth_rate: $json.marketResult?.market_growth_rate || '',\n  market_timing: $json.marketResult?.market_timing || '',\n  competitors: safeJoin($json.marketResult?.competitors?.map(c => `${c.name} (${c.strength})`)),\n  market_trends: safeJoin($json.marketResult?.market_trends),\n  market_opportunities: safeJoin($json.marketResult?.opportunities),\n  market_risks: safeJoin($json.marketResult?.risks),\n\n  // Prioritization Results\n  priority_score: $json.priorityResult?.calculated_score || 0,\n  priority_tier: $json.priorityResult?.priority_tier || 'Medium',\n  business_value_score: $json.priorityResult?.business_value || 0,\n  user_impact_score: $json.priorityResult?.user_impact || 0,\n  effort_required_score: $json.priorityResult?.effort_required || 0,\n  risk_level_score: $json.priorityResult?.risk_level || 0,\n  market_timing_score: $json.priorityResult?.market_timing || 0,\n  strategic_fit_score: $json.priorityResult?.strategic_fit || 0,\n  success_probability: $json.priorityResult?.success_probability || 0,\n  recommendation: $json.priorityResult?.recommendation || 'Review',\n  ice_impact: $json.priorityResult?.ice_score?.impact || 0,\n  ice_confidence: $json.priorityResult?.ice_score?.confidence || 0,\n  ice_ease: $json.priorityResult?.ice_score?.ease || 0,\n\n  // Roadmap Information\n  mvp_features: safeJoin($json.roadmapResult?.mvp_features),\n  mvp_timeline: $json.roadmapResult?.mvp_timeline || '',\n  phase2_features: safeJoin($json.roadmapResult?.phase2_features),\n  phase2_timeline: $json.roadmapResult?.phase2_timeline || '',\n  phase3_features: safeJoin($json.roadmapResult?.phase3_features),\n  phase3_timeline: $json.roadmapResult?.phase3_timeline || '',\n  dependencies: safeJoin($json.roadmapResult?.dependencies?.map(d => `${d.prerequisite} → ${d.dependent}`)),\n  critical_path: safeJoin($json.roadmapResult?.critical_path),\n  mvp_success_metrics: safeJoin($json.roadmapResult?.mvp_success_metrics),\n  team_requirements_mvp: safeJoin($json.roadmapResult?.team_requirements?.mvp_phase),\n  team_requirements_scale: safeJoin($json.roadmapResult?.team_requirements?.scaling_phase),\n  resource_allocation: extractNestedData($json.roadmapResult?.resource_allocation),\n\n  // Executive Summary & Output\n  executive_summary: $json.outputResult?.executive_summary || '',\n  final_recommendation: $json.outputResult?.recommendation || '',\n  key_insights: safeJoin($json.outputResult?.key_insights),\n  immediate_next_steps: safeJoin($json.outputResult?.immediate_next_steps),\n  success_metrics: safeJoin($json.outputResult?.success_metrics),\n  decision_timeline: $json.outputResult?.decision_timeline || '',\n\n  // Business Case\n  opportunity_size: $json.outputResult?.business_case?.opportunity_size || '',\n  competitive_advantage: $json.outputResult?.business_case?.competitive_advantage || '',\n  resource_investment: $json.outputResult?.business_case?.resource_investment || '',\n  expected_roi: $json.outputResult?.business_case?.expected_roi || '',\n  strategic_alignment: $json.outputResult?.strategic_alignment || '',\n\n  // Risk Management\n  risk_mitigation_strategies: safeJoin($json.outputResult?.risk_mitigation_plan?.map(r => `${r.risk}: ${r.mitigation}`)),\n  high_priority_risks: safeJoin($json.outputResult?.risk_mitigation_plan?.filter(r => r.impact === 'High')?.map(r => r.risk)),\n\n  // Input Constraints & Context\n  original_constraints: $json.constraints || '',\n  timeline_preference: $json.timelinePreference || '',\n\n  // Analysis Metadata\n  total_features_identified: (($json.roadmapResult?.mvp_features?.length || 0) + \n                              ($json.roadmapResult?.phase2_features?.length || 0) + \n                              ($json.roadmapResult?.phase3_features?.length || 0)),\n  analysis_confidence: $json.priorityResult?.confidence_level || 'Medium',\n\n  // Formatted Summaries for Quick Review\n  quick_summary: `${$json.priorityResult?.priority_tier || 'Medium'} Priority (Score: ${$json.priorityResult?.calculated_score || 0}) - ${$json.outputResult?.recommendation || 'Review'}`,\n  roadmap_summary: $json.roadmapResult?.roadmap_summary || 'Roadmap analysis pending',\n  overall_assessment: `Market: ${$json.marketResult?.attractiveness_score || 0}/10, Priority: ${$json.priorityResult?.priority_tier || 'Medium'}, Recommendation: ${$json.outputResult?.recommendation || 'Review'}`\n};\n\n// Add workflow metadata\nfinalOutput.workflow_version = '2.0';\nfinalOutput.agent_model = 'gemini-2.0-flash-exp';\nfinalOutput.processing_status = 'Complete';\n\nreturn [{ json: finalOutput }];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        3264,
+        80
+      ],
+      "id": "f1c6d326-77ae-4d5d-8dea-071779c384ed",
+      "name": "Code in JavaScript"
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1m04mkVt9B8V0hJ4yBlY31gHDxtKbEmVTjVSxYBuVXxQ",
+          "mode": "list",
+          "cachedResultName": "AI Agent Input - Ideation and Product Priority",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1m04mkVt9B8V0hJ4yBlY31gHDxtKbEmVTjVSxYBuVXxQ/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 432965560,
+          "mode": "list"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "idea_id": "={{ $json.idea_id }}",
+            "refined_idea": "={{ $('Output').item.json.ideationResult.refined_idea }}",
+            "roadmap_phase": "={{ $('Roadmap Refformated').item.json.roadmapResult }}",
+            "success_metrics": "={{ $json.success_metrics }}",
+            "effort_estimate": "={{ $json.effort_required_score }}",
+            "business_value": "={{ $json.expected_roi }}",
+            "market_analysis": "={{ $json.market_summary }}",
+            "priority_score": "={{ $json.priority_score }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "idea_id",
+              "displayName": "idea_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "refined_idea",
+              "displayName": "refined_idea",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "market_analysis",
+              "displayName": "market_analysis",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "priority_score",
+              "displayName": "priority_score",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "roadmap_phase",
+              "displayName": "roadmap_phase",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "success_metrics",
+              "displayName": "success_metrics",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "effort_estimate",
+              "displayName": "effort_estimate",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "business_value",
+              "displayName": "business_value",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        3472,
+        80
+      ],
+      "id": "fba5e2f4-94e0-47b0-9a5d-4898e1083083",
+      "name": "Append row in sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "ffM1xc7d2pQRqhXG",
+          "name": "Google Sheets account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Google Sheets Trigger": {
+      "main": [
+        [
+          {
+            "node": "Input",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Ideation",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Ideation": {
+      "main": [
+        [
+          {
+            "node": "Output",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Input": {
+      "main": [
+        [
+          {
+            "node": "Ideation",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Output": {
+      "main": [
+        [
+          {
+            "node": "Market Research",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model1": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Market Research",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Market Research": {
+      "main": [
+        [
+          {
+            "node": "MarketResearch Output",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model2": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Proritization Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Proritization Agent": {
+      "main": [
+        [
+          {
+            "node": "Prioritization Output",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model3": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Roadmap",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Roadmap": {
+      "main": [
+        [
+          {
+            "node": "Roadmap Refformated",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "MarketResearch Output": {
+      "main": [
+        [
+          {
+            "node": "Proritization Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prioritization Output": {
+      "main": [
+        [
+          {
+            "node": "Roadmap",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Roadmap Refformated": {
+      "main": [
+        [
+          {
+            "node": "Output Formatting Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model4": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Output Formatting Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Output Formatting Agent": {
+      "main": [
+        [
+          {
+            "node": "Output Reformatted",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Output Reformatted": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript": {
+      "main": [
+        [
+          {
+            "node": "Append row in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "1fbc0270-17fe-420a-8fba-782887212a29",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "7e9f595a3f803570ac30a3accb86d1efe81457c2c295b3862aeda380a47ac404"
+  },
+  "id": "NUsf6WouFvEuTNla",
+  "tags": []
+}
